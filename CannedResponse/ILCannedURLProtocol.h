@@ -27,29 +27,40 @@
 
 #import <Foundation/Foundation.h>
 
-@protocol ILCannedURLProtocolDelegate <NSObject>
-- (NSData*)responseDataForClient:(id<NSURLProtocolClient>)client request:(NSURLRequest*)request;
-@optional
-- (BOOL)shouldInitWithRequest:(NSURLRequest*)request;
-- (NSURL *)redirectForClient:(id<NSURLProtocolClient>)client request:(NSURLRequest *)request;
-- (NSInteger)statusCodeForClient:(id<NSURLProtocolClient>)client request:(NSURLRequest*)request;
-- (NSDictionary*)headersForClient:(id<NSURLProtocolClient>)client request:(NSURLRequest*)request;
-@end
+@class CannedResponse;
+
+// array of elements: NSNumber * statusCode, NSDictionary *headers, NSData * data
+typedef CannedResponse * (^Answer)(NSURLRequest *);
+
+NSDictionary *_ILCannedURLProtocol_requestHeaders;
+NSString *_ILCannedURLProtocol_request;
+NSString *_ILCannedURLProtocol_method;
+NSString *_ILCannedURLProtocol_url;
+
 
 @interface ILCannedURLProtocol : NSURLProtocol
-+ (void)setStartLoadingBlock:(void(^)(NSURLRequest *request))block;
-+ (void)setDelegate:(id<ILCannedURLProtocolDelegate>)delegate;
 
-+ (void)setCannedResponseData:(NSData*)data;
-+ (void)setCannedHeaders:(NSDictionary*)headers;
-+ (void)setCannedStatusCode:(NSInteger)statusCode;
-+ (void)setCannedError:(NSError*)error;
++ (void)setCannedStatusCode:(NSInteger) statusCode
+               responseData:(NSData *) data
+                    headers:(NSDictionary *)headers;
 
-+ (void)setSupportedMethods:(NSArray*)methods;
-+ (void)setSupportedSchemes:(NSArray*)schemes;
-+ (void)setSupportedBaseURL:(NSURL*)baseURL;
++ (void)setCannedAnswer:(Answer)answer;
 
-+ (void)setResponseDelay:(CGFloat)responseDelay;
++ (void)reset;
+@end
 
 
+@interface CannedResponse : NSObject
+
+@property(nonatomic) NSInteger statusCode;
+@property(nonatomic, copy) NSDictionary *headers;
+@property(nonatomic, copy) NSData *data;
+
+- (id)initWithStatusCode:(NSInteger)statusCode headers:(NSDictionary *)headers data:(NSData *)data;
+
++ (id)responseWithStatusCode:(NSInteger)statusCode headers:(NSDictionary *)headers data:(NSData *)data;
+
++ (id)responseWithStatusCode:(NSInteger)statusCode headers:(NSDictionary *)headers;
+
++ (id)responseWithStatusCode:(NSInteger)statusCode;
 @end
