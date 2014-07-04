@@ -30,7 +30,7 @@
 NSData *_data;
 NSDictionary *_headers;
 NSInteger _statusCode;
-NSError *_error;
+NSError *_error2;
 
 Answer _answer;
 
@@ -123,9 +123,9 @@ Answer _answer;
 
         [client URLProtocolDidFinishLoading:self];
 
-    } else if(_error) {
+    } else if(_error2) {
         // Send the canned error
-        [client URLProtocol:self didFailWithError:_error];
+        [client URLProtocol:self didFailWithError:_error2];
     } else {
         // Send the canned data
         NSHTTPURLResponse *response = [[NSHTTPURLResponse alloc] initWithURL:[request URL]
